@@ -3,12 +3,13 @@ const bcrypt = require('bcrypt');
 const _ = require('underscore');
 const app = express();
 const Usuario = require('../models/usuario');
+const { verificarToken, verificarUser_Role } = require('../middlewares/autenticacion')
 
 
 
-
-app.get('/usuario', function(req, res) {
+app.get('/usuario', verificarToken, (req, res) => {
     //res.json('get Usuario Local!!')
+
     let desde = req.query.desde || 0;
     desde = Number(desde);
     let limite = req.query.limite || 5;
@@ -36,7 +37,8 @@ app.get('/usuario', function(req, res) {
 
 });
 
-app.post('/usuario', function(req, res) {
+app.post('/usuario', [verificarToken, verificarUser_Role], (req, res) => {
+
     let body = req.body;
 
 
@@ -65,7 +67,8 @@ app.post('/usuario', function(req, res) {
     });
 });
 
-app.put('/usuario/:id', function(req, res) {
+app.put('/usuario/:id', [verificarToken, verificarUser_Role], (req, res) => {
+
     let id = req.params.id;
     let body = _.pick(req.body, ['nombre', 'correo', 'img', 'role', 'estado']);
 
@@ -84,7 +87,8 @@ app.put('/usuario/:id', function(req, res) {
         });
     });
 });
-app.delete('/usuario/:id', function(req, res) {
+app.delete('/usuario/:id', [verificarToken, verificarUser_Role], (req, res) => {
+
     let id = req.params.id;
     let cambiarEstado = {
         estado: false
